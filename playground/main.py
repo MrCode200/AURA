@@ -7,7 +7,7 @@ import struct
 import time
 
 porcupine = pvporcupine.create(
-    access_key="MUJuwpmV7cX2CKWuUGdDqy42mmifEW/CgehtYxi4D27NU/CGsEk4ww==",
+    access_key="...",
     keyword_paths=[r"./models/wakeWord/Hey-Wobble_en_windows_v3_0_0.ppn"],
 )
 
