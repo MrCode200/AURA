@@ -1,13 +1,16 @@
 import json
+import os
 
 import pvporcupine
 import pyaudio
 import vosk
 import struct
-import time
 
+from dotenv import load_dotenv
+
+load_dotenv()
 porcupine = pvporcupine.create(
-    access_key="...",
+    access_key=os.getenv("PYVOICE_API_KEY"),
     keyword_paths=[r"./models/wakeWord/Hey-Wobble_en_windows_v3_0_0.ppn"],
 )
 
