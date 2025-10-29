@@ -4,7 +4,8 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.prebuilt import create_react_agent
 from langchain_ollama import ChatOllama
 
-from src.agent.audio import AudioEngine
+from src.agent.engines import AudioEngine
+from config import settings
 from tools import tool_registry
 
 logger = logging.getLogger("aura.log")
@@ -28,7 +29,7 @@ class Agent:
         agent = create_react_agent(
             model=llm,
             tools=tools,
-            prompt="You are a helpful assistant. You talk like a very wise and old magician. Don't use any emojis!", # TODO: get from settings
+            prompt=settings.system_prompt, # TODO: get from settings
             debug=True,
             checkpointer=checkpointer,
         )
@@ -39,9 +40,12 @@ class Agent:
         while True:
             if self.audio_engine.listen_for_wake_word():
                 logger.debug("Wake word detected!")
-                user_prompt: str = self.audio_engine.transcribe_audio()['text']
+                self.audio_engine.play_audio(f"yes_master_{settings.tts_speaker}.wav")
+
+                user_prompt: str = self.audio_engine.speech_to_text()['text']
                 print(user_prompt) # TODO: logger.debug
 
                 config = {"configurable": {"thread_id": "session1"}}
                 response = self.agent.invoke({"messages": [{"role": "user", "content": user_prompt}]}, config)
                 print(response["messages"][-1].content) # TODO: logger.debug
+                self.audio_engine.text_to_speech(response["messages"][-1].content)

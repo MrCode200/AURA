@@ -16,7 +16,7 @@ tool_registry = Registry(
 
 tools_dir = os.path.dirname(os.path.abspath(__file__))
 logger.info("Loading tools...")
-for finder, name, ispkg in pkgutil.iter_modules([tools_dir]):
+for finder, name, _ in pkgutil.iter_modules([tools_dir]):
     if name == "__init__":
         continue
     try:

@@ -4,20 +4,21 @@ from pathlib import Path
 from dotenv import load_dotenv
 from magic_utils import setup_logger
 
+from config import settings
 
 def main():
     print(str(Path(".").resolve().parent))
     logger = setup_logger(
         "aura.log",
-        str(Path(".").resolve().parent.joinpath("logs/log.jsonl")),
+        str(settings.root_path.joinpath("logs/log.jsonl")),
         DEBUG,
         DEBUG,
     )
-    logger.info("Starting AURA...")
+    logger.info("Starting Project AURA...")
     load_dotenv()
 
     from src.agent import Agent # First create logger, then import other modules
-    agent = Agent()
+    agent = Agent() #memory_saver=InMemorySaver()
     agent.start()
 
 
