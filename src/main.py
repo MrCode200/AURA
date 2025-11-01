@@ -1,5 +1,4 @@
 from logging import DEBUG
-from pathlib import Path
 
 from dotenv import load_dotenv
 from magic_utils import setup_logger
@@ -7,7 +6,6 @@ from magic_utils import setup_logger
 from config import settings
 
 def main():
-    print(str(Path(".").resolve().parent))
     logger = setup_logger(
         "aura.log",
         str(settings.root_path.joinpath("logs/log.jsonl")),
@@ -18,7 +16,9 @@ def main():
     load_dotenv()
 
     from src.agent import Agent # First create logger, then import other modules
-    agent = Agent() #memory_saver=InMemorySaver()
+    agent = Agent(
+        wait_for_audio_end=False
+    ) #memory_saver=InMemorySaver()
     agent.start()
 
 

@@ -12,8 +12,8 @@ logger = logging.getLogger("aura.log")
 
 
 class Agent:
-    def __init__(self):
-        self.audio_engine = AudioEngine()
+    def __init__(self, wait_for_audio_end: bool = True):
+        self.audio_engine = AudioEngine(wait_for_audio_end)
         self.agent = self._create_agent()
         self.stop = False
 
