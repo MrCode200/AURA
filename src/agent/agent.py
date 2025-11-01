@@ -15,11 +15,12 @@ class Agent:
     def __init__(self):
         self.audio_engine = AudioEngine()
         self.agent = self._create_agent()
+        self.stop = False
 
     @staticmethod
     def _create_agent():
         llm = ChatOllama(
-            model="qwen3:8b-q4_K_M", #TODO: get from settings
+            model=settings.agent_model, #TODO: get from settings
             temperature=0
         )
 
@@ -37,7 +38,7 @@ class Agent:
 
     def start(self):
         logger.info("Agent AURA started.")
-        while True:
+        while not self.stop:
             if self.audio_engine.listen_for_wake_word():
                 logger.debug("Wake word detected!")
                 self.audio_engine.play_audio(f"yes_master_{settings.tts_speaker}.wav")
@@ -49,3 +50,9 @@ class Agent:
                 response = self.agent.invoke({"messages": [{"role": "user", "content": user_prompt}]}, config)
                 print(response["messages"][-1].content) # TODO: logger.debug
                 self.audio_engine.text_to_speech(response["messages"][-1].content)
+
+        self.stop = False
+
+    def stop(self):
+        self.stop = True
+        self.audio_engine.close()

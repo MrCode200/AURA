@@ -10,7 +10,8 @@ Every tool file must include:
 
 ```python
 from tools import tool_registry  # Required for agent discovery
-from tools.toolResult import ToolResult  # Standardized output
+from tools.toolResponse import ToolResponse  # Standardized output
+
 
 @tool_registry.register_function()
 def example_tool(param: str) -> dict:
@@ -23,12 +24,12 @@ def example_tool(param: str) -> dict:
     try:
         # Tool logic here
         result = f"Processed {param}"
-        return ToolResult(
+        return ToolResponse(
             status="success",
             message=result
         ).model_dump()
     except Exception as e:
-        return ToolResult(
+        return ToolResponse(
             status="error",
             message="Failed to process the input",
             error=str(e)

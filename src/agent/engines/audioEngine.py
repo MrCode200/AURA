@@ -26,7 +26,9 @@ class AudioEngine:
     Audio engine for the agent.
     """
 
-    def __init__(self):
+    def __init__(self, wait_for_audio_end: bool = True):
+        self.wait_for_audio_end = wait_for_audio_end
+
         logger.debug("Loading Porcupine Model")
         porcupine_model_path = settings.root_path.joinpath("models/wakeWord",
                                                            settings.hot_word_model)  # TODO: Choose Multiple Wake Words and from config
@@ -103,15 +105,16 @@ class AudioEngine:
         Uses TTS models to convert text to speech.
         :param text: The text to convert to speech.
         """
-        try:
-            stream = sd.get_stream()
-            if stream is not None and stream.active:
-                sd.wait()
-        except RuntimeError as e:
-            if str(e) == 'play()/rec()/playrec() was not called yet':
-                pass
-            else:
-                raise
+        if self.wait_for_audio_end:
+            try:
+                stream = sd.get_stream()
+                if stream is not None and stream.active:
+                    sd.wait()
+            except RuntimeError as e:
+                if str(e) == 'play()/rec()/playrec() was not called yet':
+                    pass
+                else:
+                    raise
 
         audio_array = self.tts_partial(text=text)  # TODO: Speaker and language from config
         sd.play(audio_array, samplerate=22050)
@@ -121,15 +124,16 @@ class AudioEngine:
         Plays an audio from models/tts/<model_name.replace('/', '-')>/<premade_audio_name>
         :param premade_audio_name: The name of the audio file to play. Must contain the file extension.
         """
-        try:
-            stream = sd.get_stream()
-            if stream is not None and stream.active:
-                sd.wait()
-        except RuntimeError as e:
-            if str(e) == 'play()/rec()/playrec() was not called yet':
-                pass
-            else:
-                raise
+        if self.wait_for_audio_end:
+            try:
+                stream = sd.get_stream()
+                if stream is not None and stream.active:
+                    sd.wait()
+            except RuntimeError as e:
+                if str(e) == 'play()/rec()/playrec() was not called yet':
+                    pass
+                else:
+                    raise
 
         audio_path = self.premade_audio_path.joinpath(premade_audio_name)
         data, samplerate = sf.read(str(audio_path), dtype='float32')
