@@ -12,10 +12,11 @@ logger = logging.getLogger("aura.log")
 
 
 class Agent:
-    def __init__(self, wait_for_audio_end: bool = True):
+    def __init__(self, wait_for_audio_end: bool = True, confirm_prompt: bool = False):
         self.audio_engine = AudioEngine(wait_for_audio_end)
         self.agent = self._create_agent()
         self.stop = False
+        self.confirm_prompt = confirm_prompt
 
     @staticmethod
     def _create_agent():
@@ -44,14 +45,21 @@ class Agent:
                 self.audio_engine.play_audio(f"yes_master_{settings.tts_speaker}.wav")
 
                 user_prompt: str = self.audio_engine.speech_to_text()['text']
-                print(user_prompt) # TODO: logger.debug
+                if self.confirm_prompt:
+                    if input(f"Prompt: {user_prompt} (y/n)") != "y":
+                        continue
 
-                config = {"configurable": {"thread_id": "session1"}}
-                response = self.agent.invoke({"messages": [{"role": "user", "content": user_prompt}]}, config)
-                print(response["messages"][-1].content) # TODO: logger.debug
-                self.audio_engine.text_to_speech(response["messages"][-1].content)
+                print(user_prompt) # TODO: logger.debug
+                self.prompt_agent(user_prompt)
 
         self.stop = False
+
+
+    def prompt_agent(self, user_prompt: str):
+        config = {"configurable": {"thread_id": "session1"}}
+        response = self.agent.invoke({"messages": [{"role": "user", "content": user_prompt}]}, config)
+        print(response["messages"][-1].content)  # TODO: logger.debug
+        self.audio_engine.text_to_speech(response["messages"][-1].content)
 
     def stop(self):
         self.stop = True

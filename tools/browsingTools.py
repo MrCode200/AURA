@@ -87,7 +87,7 @@ def browse(query: str | list[str], top_k: int = 3) -> dict:
             return ToolResponse(
                 status="success",
                 message=f"No results found for {query}",
-                metadata={"results": []}
+                details={"results": []}
             ).model_dump()
 
         chars_per_page = int(MAX_CHARS_TOTAL / len(results))
@@ -114,12 +114,13 @@ def browse(query: str | list[str], top_k: int = 3) -> dict:
         return ToolResponse(
             status="success",
             message=f"{query} browsed successfully",
-            metadata={"results": browse_results}
+            details={"results": browse_results}
         ).model_dump()
     except Exception as e:
+        logger.error(f"Failed to browse {query}: {str(e)}")
         return ToolResponse(
             status="error",
             message=f"Failed to browse {query}",
-            metadata={"results": browse_results},
+            details={"results": browse_results},
             error=str(e)
         ).model_dump()
